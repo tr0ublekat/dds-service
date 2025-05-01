@@ -3,52 +3,46 @@ from django.db import models
 
 
 class Status(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    
+    name = models.CharField("Статус", max_length=100, unique=True)
+
     def __str__(self):
         return self.name
 
 
 class Type(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    
+    name = models.CharField("Тип", max_length=100, unique=True)
+
     def __str__(self):
         return self.name
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=100)
-    type = models.ForeignKey(Type, on_delete=models.CASCADE)
-    
-    class Meta:
-        # Уникальность по имени и типу
-        unique_together = ('name', 'type')
-    
+    name = models.CharField("Категория", max_length=100)
+    type = models.ForeignKey(Type, verbose_name="Тип", on_delete=models.CASCADE)
+
     def __str__(self):
         return f"{self.name} ({self.type})"
 
 
 class Subcategory(models.Model):
-    name = models.CharField(max_length=100)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    
-    class Meta:
-        # Уникальность по имени и категории
-        unique_together = ('name', 'category')
-    
+    name = models.CharField("Подкатегория", max_length=100)
+    category = models.ForeignKey(Category, verbose_name="Категория", on_delete=models.CASCADE)
+
     def __str__(self):
         return f"{self.name} ({self.category})"
 
 
-class DDSRecord(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    date = models.DateField()  # Дата, которую можно редактировать
-    status = models.ForeignKey(Status, on_delete=models.PROTECT)
-    type = models.ForeignKey(Type, on_delete=models.PROTECT)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT)
-    subcategory = models.ForeignKey(Subcategory, on_delete=models.PROTECT)
-    amount = models.PositiveIntegerField()  # Сумма в рублях
-    comment = models.TextField(blank=True, null=True)
-    
+# Основная модель ДДС
+class DDSEntry(models.Model):
+    date = models.DateField("Дата записи")
+    status = models.ForeignKey(Status, verbose_name="Статус", on_delete=models.PROTECT)
+    type = models.ForeignKey(Type, verbose_name="Тип", on_delete=models.PROTECT)
+    category = models.ForeignKey(Category, verbose_name="Категория", on_delete=models.PROTECT)
+    subcategory = models.ForeignKey(Subcategory, verbose_name="Подкатегория", on_delete=models.PROTECT)
+    amount = models.DecimalField("Сумма (руб)", max_digits=12, decimal_places=2)
+    comment = models.TextField("Комментарий", blank=True)
+    created_at = models.DateTimeField("Дата создания", auto_now_add=True)
+    updated_at = models.DateTimeField("Дата обновления", auto_now=True)
+
     def __str__(self):
-        return f"{self.date} - {self.amount}р"
+        return f"{self.date} | {self.type} | {self.amount} руб"
