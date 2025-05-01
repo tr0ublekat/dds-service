@@ -35,7 +35,7 @@ pip install -r requirements.txt
 ###
 Для простоты запуска:
 - База данных sqlite3  с тестовыми данными уже вложена в репозиторий.
-- Статики для `django-grappelli` уже собраны.
+- Собрать статику - ```python manage.py collectstatic```
 
 ---
 
@@ -49,6 +49,7 @@ python manage.py runserver
 
 ### Доступ
 Админ панель - `http://localhost:8000/admin`.
+
 Авторизация - `admin:admin`.
 
 ---
